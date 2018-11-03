@@ -33,8 +33,12 @@ private:
 
 	bool GetLookDirection(FVector2D ScreenLocation, FVector& LookDirection) const;
 
+	bool GetLookVectorHitLocation(FVector& LookDirection, FVector& HitLocation) const;
+
 	UPROPERTY(EditAnywhere)
 		float CrosshairXLocation = 0.5f; 
 	UPROPERTY(EditAnywhere)
 		float CrosshairYLocation = (1.f / 3.f);
+	UPROPERTY(EditAnywhere)
+		float LineTraceRange = 1000000;
 };
