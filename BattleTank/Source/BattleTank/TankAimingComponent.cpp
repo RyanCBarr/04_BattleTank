@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "TankBarrel.h"
 #include "TankAimingComponent.h"
-
 
 // Sets default values for this component's properties
 UTankAimingComponent::UTankAimingComponent()
@@ -13,6 +13,11 @@ UTankAimingComponent::UTankAimingComponent()
 	// ...
 }
 
+
+void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
+{
+	Barrel = BarrelToSet;
+}
 
 void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 {
@@ -43,10 +48,6 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 	}
 }
 
-void UTankAimingComponent::SetBarrelReference(UStaticMeshComponent* BarrelToSet)
-{
-	Barrel = BarrelToSet;
-}
 
 void UTankAimingComponent::MoveBarrelTowards(FVector aimDirection)
 {
@@ -57,7 +58,7 @@ void UTankAimingComponent::MoveBarrelTowards(FVector aimDirection)
 	auto aimAsRotator = aimDirection.Rotation();
 	auto deltaRotator = aimAsRotator - barrelRotator;
 
-	UE_LOG(LogTemp, Warning, TEXT("AimAsRoator: %s"), *deltaRotator.ToString())
-	//move barrel the right amount this frame given max speed and frametime
-		//elevate barrel to align socket with correct firing solution location
+	Barrel->Elevate(5.f);
+	//Barrel->Elevate(5.f); //TODO remove magic number
+
 }
