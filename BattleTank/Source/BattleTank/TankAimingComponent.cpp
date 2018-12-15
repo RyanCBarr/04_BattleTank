@@ -1,27 +1,35 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "TankBarrel.h"
 #include "TankAimingComponent.h"
+#include "TankBarrel.h"
+#include "TankTurret.h"
+#include "Engine/World.h"
+
 
 // Sets default values for this component's properties
 UTankAimingComponent::UTankAimingComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true; //TODO should this tick?
+	PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
 }
-
 
 void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
 {
+	if (!BarrelToSet) { return; }
 	Barrel = BarrelToSet;
+}
+
+void UTankAimingComponent::SetTurretReference(UTankTurret* TurretToSet)
+{
+	if (!TurretToSet) { return; }
+	Turret = TurretToSet;
 }
 
 void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 {
-	if (!Barrel) { return; }
+	if (!Barrel || !Turret) { return; }
 	FVector outLaunchVelocity(0);
 	FVector startLocation = Barrel->GetSocketLocation(FName("Projectile"));
 
@@ -33,6 +41,9 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 		startLocation,
 		HitLocation,
 		LaunchSpeed,
+		false,
+		0,
+		0,
 		ESuggestProjVelocityTraceOption::DoNotTrace
 	);
 
@@ -59,14 +70,11 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 
 void UTankAimingComponent::MoveBarrelTowards(FVector aimDirection)
 {
-	//rotate turret to align socket with correct firing solution location
-
 	//get difference between current barrel rotation and aimDirection
-	auto barrelRotator = Barrel->GetForwardVector().Rotation();
+	auto BarrelRotator = Barrel->GetForwardVector().Rotation();
 	auto aimAsRotator = aimDirection.Rotation();
-	auto deltaRotator = aimAsRotator - barrelRotator;
+	auto deltaRotator = aimAsRotator - BarrelRotator;
 
-	Barrel->Elevate(5.f);
-	//Barrel->Elevate(5.f); //TODO remove magic number
-
+	Barrel->Elevate(deltaRotator.Pitch);
+	Turret->Rotate(deltaRotator.Yaw);
 }
